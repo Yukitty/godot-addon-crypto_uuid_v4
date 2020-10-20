@@ -35,6 +35,7 @@ func _init(from = null):
 			_hex_byte(from, 24), _hex_byte(from, 26), _hex_byte(from, 28),
 			_hex_byte(from, 30), _hex_byte(from, 32), _hex_byte(from, 34)
 		])
+		_string = from
 	else:
 		_data = v4bin()
 
