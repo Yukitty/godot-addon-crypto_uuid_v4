@@ -7,8 +7,11 @@ Web builds will attempt to use the web browser-provided crypto object if availab
 ## Usage
 
 Generating UUIDs:
-1. `UUID.new() -> UUID` generates a new UUIDv4 object.
-2. `UUID.v4() -> String` generates a UUIDv4 string.
+1. `UUID.new() -> UUID` generates a new randomized UUIDv4 object. (See following sections for usage.)
+
+**OR**
+
+2. `UUID.v4() -> String` generates a plain UUIDv4 string. (This is a `static` function, you do not need to call `new()` first.)
 
 Comparing UUIDs:
 1. `uuid_a.is_equal(uuid_b) -> bool` can compare UUID objects, a UUID object against a UUID string, or a UUID object against a PoolByteArray containing 16 bytes.
