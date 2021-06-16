@@ -1,10 +1,11 @@
+tool
 class_name UUID
-extends Reference
+extends Resource
 # Crypto UUID v4
 #
 # Provides cryptographically secure UUID v4 objects.
 # Can be used and compared in string format,
-# or as persistent UUID reference objects.
+# or as persistent UUID resource objects.
 #
 # See https://github.com/Yukitty/godot-addon-crypto_uuid_v4/
 # for usage details.
@@ -17,7 +18,8 @@ var _data: PoolByteArray
 var _string: String
 
 
-func _init(from = null):
+func _init(from = null) -> void:
+	resource_name = "UUID"
 	if from is PoolByteArray:
 		assert(from.size() == 16)
 		_data = from
