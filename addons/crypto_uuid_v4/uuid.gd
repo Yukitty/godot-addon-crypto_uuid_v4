@@ -102,13 +102,15 @@ static func v4bin() -> PoolByteArray:
 
 		if not data:
 			# Generate weak random values
-			# ONLY when Crypto is not provided by the browser
-			randomize()
+			# ONLY as a last resort,
+			# when Crypto is not provided by the browser
+			var rng := RandomNumberGenerator.new()
+			rng.randomize()
 			data = PoolByteArray([
-				_randb(), _randb(), _randb(), _randb(),
-				_randb(), _randb(), _randb(), _randb(),
-				_randb(), _randb(), _randb(), _randb(),
-				_randb(), _randb(), _randb(), _randb()
+				_randb(rng), _randb(rng), _randb(rng), _randb(rng),
+				_randb(rng), _randb(rng), _randb(rng), _randb(rng),
+				_randb(rng), _randb(rng), _randb(rng), _randb(rng),
+				_randb(rng), _randb(rng), _randb(rng), _randb(rng)
 			])
 
 	else:
@@ -126,8 +128,8 @@ static func format(data: PoolByteArray) -> String:
 
 
 # Private helper func
-static func _randb() -> int:
-	return randi() % 0x100
+static func _randb(rng) -> int:
+	return rng.randi_range(0x00,0xff)
 
 
 static func _hex_byte(text: String, offset: int) -> int:
