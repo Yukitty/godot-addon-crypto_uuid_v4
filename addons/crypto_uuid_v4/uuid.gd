@@ -11,79 +11,50 @@ extends Resource
 # for usage details.
 
 
-# Internal state
-# Prefer `UUID.new(from)` and `uuid_a.is_equal(uuid_b)`
-# over messing with these, please
-var _data: PoolByteArray
-var _string: String
+export var string : String
 
 
 func _init(from = null) -> void:
 	resource_name = "UUID"
 	if from is PoolByteArray:
 		assert(from.size() == 16)
-		_data = from
+		string = format(from)
 	elif from is String:
 		assert(from.length() == 36)
-		_data = PoolByteArray([
-			_hex_byte(from, 0), _hex_byte(from, 2), _hex_byte(from, 4), _hex_byte(from, 6),
-			# skip hyphen
-			_hex_byte(from, 9), _hex_byte(from, 11),
-			# skip hyphen
-			_hex_byte(from, 14), _hex_byte(from, 16),
-			# skip hyphen
-			_hex_byte(from, 19), _hex_byte(from, 21),
-			# skip hyphen
-			_hex_byte(from, 24), _hex_byte(from, 26), _hex_byte(from, 28),
-			_hex_byte(from, 30), _hex_byte(from, 32), _hex_byte(from, 34)
-		])
-		_string = from
+		string = from
 	else:
-		_data = v4bin()
-
-	# Sanity tests
-	assert(_data[6] & 0xf0 == 0x40)
-	assert(_data[8] & 0xc0 == 0x80)
+		string = v4()
+	assert(is_valid(string))
+	resource_name = "UUID:" + string
 
 
-# Special string representation
-# Cached for rapid comparisons
+# The string is just the UUID
 func _to_string() -> String:
-	if _string:
-		return _string
-	_string = format(_data)
-	return _string
+	return string
+
+
+# Returns true if UUID string passes basic sanity tests
+static func is_valid(uuid : String) -> bool:
+	return uuid.length() == 36 and uuid[8] == '-' and uuid[13] == '-' and uuid[18] == '-' and uuid[23] == '-' and _hex_byte(uuid, 14) & 0xf0 == 0x40 and _hex_byte(uuid, 19) & 0xc0 == 0x80
 
 
 # Compare a UUID object with another UUID, String, or PoolByteArray.
 func is_equal(object) -> bool:
-	# Compare UUID
-	if object is Object and get_script().instance_has(object):
-		# If string cache is available, compare string refs (fastest)
-		if _string and object._string:
-			return _string == object._string
-		# Otherwise, compare data
-		# (slightly slower, but faster than building a string)
-		assert(object._data is PoolByteArray)
-		object = object._data
-		# Fallthrough to PoolByteArray handling
+	# Compare UUID objects
+	if object is Resource and get_script().instance_has(object):
+		return string == object.string
 
-	# int compare, stop at first mismatch
+	# Compare to raw UUID data
 	if object is PoolByteArray:
 		if object.size() != 16:
 			return false
-		for i in 16:
-			if _data[i] != object[i]:
-				return false
-		return true
+		return string == format(object)
 
-	# Build string representation (if needed) and compare
-	if not _string:
-		_string = format(_data)
-	return _string == str(object)
+	# Compare strings
+	return string == str(object)
 
 
-# Convinience func, essentially str(UUID.new())
+# Convinience func
 static func v4() -> String:
 	return format(v4bin())
 
